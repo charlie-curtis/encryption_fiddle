@@ -15,6 +15,10 @@ public class AESEncryptionStrategy implements EncryptionStrategy
     private Key key;
     private IvParameterSpec ivSpec;
 
+    /**
+     * Sets up the encryption algorithm to use AES encryption
+     * @param key must be a valid AES encryption size. 128/192/256 bits
+     */
     public AESEncryptionStrategy(byte[] key)
     {
         try {
