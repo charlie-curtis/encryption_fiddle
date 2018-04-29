@@ -55,17 +55,4 @@ public class AESEncryptionStrategy implements EncryptionStrategy
         }
         return new byte[0];
     }
-
-    public static void main(String[] args) {
-
-        String key = "ABCDEFGHIJKLMNOPQRSTUVWX";
-        AESEncryptionStrategy strat = new AESEncryptionStrategy(key.getBytes());
-        String s = "BLA BLA BLA BLA BLA BLA BLA BLA BLA";
-        byte[] plainText = s.getBytes();
-        byte[] cipherText = strat.encrypt(plainText);
-        byte[] decryptedText = strat.decrypt(cipherText);
-        for (byte b : decryptedText) {
-            System.out.println((char) b);
-        }
-    }
 }
