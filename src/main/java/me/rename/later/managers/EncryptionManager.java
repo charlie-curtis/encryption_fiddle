@@ -1,14 +1,25 @@
 package me.rename.later.managers;
 
+import me.rename.later.interfaces.EncryptionStrategy;
+
 public class EncryptionManager {
 
-    private String cipherText;
-    private String plainText;
-    private String encryptionKey;
+    private byte[] encryptionKey;
+    private EncryptionStrategy encryptionStrategy;
 
-    public EncryptionManager(String plainText, String encryptionKey)
+    public EncryptionManager(EncryptionStrategy encryptionStrategy, byte[] encryptionKey)
     {
-        this.plainText = plainText;
+        this.encryptionStrategy = encryptionStrategy;
         this.encryptionKey = encryptionKey;
+    }
+
+    public byte[] decrypt(byte[] cipherText)
+    {
+        return this.encryptionStrategy.decrypt(cipherText);
+    }
+
+    public byte[] encrypt(byte[] plainText)
+    {
+        return this.encryptionStrategy.encrypt(plainText);
     }
 }
