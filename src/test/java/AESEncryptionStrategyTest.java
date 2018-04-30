@@ -18,4 +18,14 @@ public class AESEncryptionStrategyTest {
         String decryptedString = new String(decryptedText);
         assertEquals(originalString, decryptedString);
     }
+
+    @Test
+    public void testThrowsExceptionForWrongKeyLength()
+    {
+        Executable testCode = () -> {
+            String key = "NOT_THE_RIGHT_LENGTH";
+            new AESEncryptionStrategy(key.getBytes());
+        };
+        assertThrows(Exception.class, testCode);
+    }
 }
