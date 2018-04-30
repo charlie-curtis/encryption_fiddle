@@ -1,12 +1,13 @@
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Executable;
 import org.junit.jupiter.api.Test;
 import me.rename.later.strategies.AESEncryptionStrategy;
 
 public class AESEncryptionStrategyTest {
 
-
     @Test
-    public void testSuccesfullyDecryptsMsg()
+    public void testSuccesfullyDecryptsMsg() throws Exception
     {
         String key = "ABCDEFGHIJKLMNOPQRSTUVWX";
         AESEncryptionStrategy strat = new AESEncryptionStrategy(key.getBytes());
