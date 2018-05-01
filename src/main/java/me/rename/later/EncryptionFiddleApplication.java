@@ -17,17 +17,12 @@ public class EncryptionFiddleApplication extends Application<EncryptionFiddleCon
     }
 
     @Override
-    public void initialize(Bootstrap<EncryptionFiddleConfiguration> bootstrap) {
-        // nothing to do yet
-    }
+    public void initialize(Bootstrap<EncryptionFiddleConfiguration> bootstrap) {}
 
     @Override
     public void run(EncryptionFiddleConfiguration configuration,
                     Environment environment) {
-        // nothing to do yet
-        final EncryptionFiddleResource resource = new EncryptionFiddleResource(
-            "TODO", "TODO"
-        );
+        final EncryptionFiddleResource resource = new EncryptionFiddleResource();
         environment.jersey().register(resource);
     }
 }

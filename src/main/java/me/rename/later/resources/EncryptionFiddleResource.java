@@ -16,17 +16,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.TEXT_PLAIN)
 public class EncryptionFiddleResource {
 
-    /*
-    private final String template;
-    private final String defaultName;
-    private final AtomicLong counter;
-    */
-    public EncryptionFiddleResource(String template, String defaultName) {
-/*        this.template = template;
-        this.defaultName = defaultName;
-        this.counter = new AtomicLong();
-*/
-    }
+    public EncryptionFiddleResource() {}
 
     /**
      * //TODO build the base64 into request/ response headers if possible
