@@ -4,13 +4,11 @@ import me.rename.later.interfaces.EncryptionStrategy;
 
 public class EncryptionManager {
 
-    private byte[] encryptionKey;
     private EncryptionStrategy encryptionStrategy;
 
-    public EncryptionManager(EncryptionStrategy encryptionStrategy, byte[] encryptionKey)
+    public EncryptionManager(EncryptionStrategy encryptionStrategy)
     {
         this.encryptionStrategy = encryptionStrategy;
-        this.encryptionKey = encryptionKey;
     }
 
     public byte[] decrypt(byte[] cipherText)
