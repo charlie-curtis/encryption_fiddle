@@ -4,8 +4,6 @@ import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import me.rename.later.resources.EncryptionFiddleResource;
-//import com.example.helloworld.resources.HelloWorldResource;
-//import com.example.helloworld.health.TemplateHealthCheck;
 
 public class EncryptionFiddleApplication extends Application<EncryptionFiddleConfiguration>{
 
