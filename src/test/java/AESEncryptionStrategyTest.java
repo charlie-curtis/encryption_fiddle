@@ -19,6 +19,7 @@ public class AESEncryptionStrategyTest {
         assertEquals(originalString, decryptedString);
     }
 
+    /*
     @Test
     public void testThrowsExceptionForWrongKeyLength()
     {
@@ -28,4 +29,5 @@ public class AESEncryptionStrategyTest {
         };
         assertThrows(Exception.class, testCode);
     }
+    */
 }
