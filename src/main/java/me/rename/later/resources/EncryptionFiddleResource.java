@@ -15,6 +15,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.HashMap;
 
 //TODO make API in README.md
@@ -52,7 +54,7 @@ public class EncryptionFiddleResource {
         return Response.ok(generatedKeys).build();
     }
     /**
-     * Encrypts plaintext using the AES Encryption Algorithm
+     * Encrypts plaintext using the AES Cipher
      * @param plainText String - as of right now, this string must be base 64 encoded
      * @param key String
      * @return
@@ -77,7 +79,7 @@ public class EncryptionFiddleResource {
     }
 
     /**
-     * Decrypts ciphertext using the AES Encryption algorithm
+     * Decrypts ciphertext using the AES Cipher
      * @param cipherText String - as of right now, this string must be base64 encoded
      * @param key String
      * @return
@@ -92,6 +94,55 @@ public class EncryptionFiddleResource {
             EncryptionManager manager = new EncryptionManager(strat);
             byte[] plainText = manager.decrypt(cipherText.getBytes());
             return Response.ok(new String(plainText)).build();
+        } catch (GeneralSecurityException e) {
+            if (EncryptionExceptionHandler.isClientError(e)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            }
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Decrypts ciphertext using the RSA Cipher
+     * @param cipherText String - as of right now, this string must be base64 encoded
+     * @param key String
+     * @return
+     */
+    @Path("decrypt/rsa/text/{cipherText}/key/{key}")
+    @GET
+    @Timed
+    public Response rsaDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
+        try {
+            PrivateKey secretKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
+            EncryptionStrategy strat = new AESEncryptionStrategy(secretKey);
+            EncryptionManager manager = new EncryptionManager(strat);
+            byte[] plainText = manager.decrypt(cipherText.getBytes());
+            return Response.ok(new String(plainText)).build();
+        } catch (GeneralSecurityException e) {
+            if (EncryptionExceptionHandler.isClientError(e)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            }
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    /**
+     * Encrypts plaintext using the RSA Encryption algorithm
+     * @param plainText String - as of right now, this string must be base64 encoded
+     * @param key String
+     * @return
+     */
+    @Path("decrypt/rsa/text/{plainText}/key/{key}")
+    @GET
+    @Timed
+    public Response rsaEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
+        try {
+            PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
+            EncryptionStrategy strat = new AESEncryptionStrategy(publicKey);
+            EncryptionManager manager = new EncryptionManager(strat);
+            byte[] cipherText = manager.decrypt(plainText.getBytes());
+            return Response.ok(new String(cipherText)).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
