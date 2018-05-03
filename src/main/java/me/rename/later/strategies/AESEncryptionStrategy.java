@@ -1,11 +1,8 @@
 package me.rename.later.strategies;
 
 import me.rename.later.interfaces.EncryptionStrategy;
-import org.apache.commons.lang3.ArrayUtils;
-
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 
 public class AESEncryptionStrategy implements EncryptionStrategy

@@ -13,12 +13,9 @@ public class RSAEncryptionStrategy implements EncryptionStrategy
 
     public RSAEncryptionStrategy(PublicKey publicKey, PrivateKey privateKey) throws GeneralSecurityException
     {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
         this.cipher = Cipher.getInstance("RSA");
-        this.publicKey = keyPair.getPublic();
-        this.privateKey = keyPair.getPrivate();
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
     }
 
     /**
