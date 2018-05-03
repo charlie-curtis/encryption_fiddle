@@ -1,6 +1,7 @@
 package me.rename.later.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import me.rename.later.exceptions.EncryptionExceptionHandler;
 import me.rename.later.interfaces.EncryptionStrategy;
 import me.rename.later.managers.EncryptionManager;
 import me.rename.later.strategies.AESEncryptionStrategy;
@@ -11,22 +12,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.GeneralSecurityException;
 
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
 public class EncryptionFiddleResource {
 
-    /*
-    private final String template;
-    private final String defaultName;
-    private final AtomicLong counter;
-    */
-    public EncryptionFiddleResource(String template, String defaultName) {
-/*        this.template = template;
-        this.defaultName = defaultName;
-        this.counter = new AtomicLong();
-*/
-    }
+    public EncryptionFiddleResource() {}
 
     /**
      * //TODO build the base64 into request/ response headers if possible
@@ -44,9 +36,12 @@ public class EncryptionFiddleResource {
             EncryptionManager manager = new EncryptionManager(strat);
             byte[] cipherText = manager.encrypt(plainText.getBytes());
             return Response.ok(new String(cipherText)).build();
-        } catch (Exception e) {
-            //TODO fix this blanket exception
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (GeneralSecurityException e) {
+            if (EncryptionExceptionHandler.isClientError(e)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            }
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
     }
@@ -66,10 +61,12 @@ public class EncryptionFiddleResource {
             EncryptionManager manager = new EncryptionManager(strat);
             byte[] plainText = manager.decrypt(cipherText.getBytes());
             return Response.ok(new String(plainText)).build();
-        } catch (Exception e) {
-            //TODO fix this blanket exception
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (GeneralSecurityException e) {
+            if (EncryptionExceptionHandler.isClientError(e)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            }
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-
     }
 }

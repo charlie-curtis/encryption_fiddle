@@ -6,8 +6,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.GeneralSecurityException;
-import java.security.Key;
+import java.security.*;
 
 public class AESEncryptionStrategy implements EncryptionStrategy
 {
@@ -20,49 +19,27 @@ public class AESEncryptionStrategy implements EncryptionStrategy
      * Sets up the encryption algorithm to use AES encryption
      * @param key must be a valid AES encryption size. 128/192/256 bits
      */
-    public AESEncryptionStrategy(byte[] key) throws Exception
+    public AESEncryptionStrategy(byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException
     {
         int[] validKeyLengths = {16, 24, 32};
-        if (!ArrayUtils.contains(validKeyLengths, key.length)) {
-            //TODO throw a real exception, not a generic blanket
-            throw new Exception("invalid key length");
-        }
-        try {
-            this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        } catch (GeneralSecurityException e) {
-            //TODO log error, return 400
-            e.printStackTrace();
-            System.exit(1);
-        }
+        this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.key = new SecretKeySpec(key, "AES");
         //TODO redesign the IV spec
         byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this.ivSpec = new IvParameterSpec(iv);
     }
 
-    public byte[] encrypt(byte[] plainText)
+    public byte[] encrypt(byte[] plainText) throws InvalidKeyException,
+        InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
     {
-        try {
-            this.cipher.init(Cipher.ENCRYPT_MODE, this.key, ivSpec);
-            return this.cipher.doFinal(plainText);
-        } catch (GeneralSecurityException e) {
-            //TODO log error, return 400
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return new byte[0];
+        this.cipher.init(Cipher.ENCRYPT_MODE, this.key, ivSpec);
+        return this.cipher.doFinal(plainText);
     }
 
-    public byte[] decrypt(byte[] cipherText)
+    public byte[] decrypt(byte[] cipherText) throws InvalidKeyException,
+        InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
     {
-        try {
-            this.cipher.init(Cipher.DECRYPT_MODE, this.key, this.ivSpec);
-            return this.cipher.doFinal(cipherText);
-        } catch (GeneralSecurityException e) {
-            //TODO log error, return 400
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return new byte[0];
+        this.cipher.init(Cipher.DECRYPT_MODE, this.key, this.ivSpec);
+        return this.cipher.doFinal(cipherText);
     }
 }
