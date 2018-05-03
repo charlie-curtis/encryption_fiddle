@@ -1,15 +1,26 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import me.rename.later.helpers.KeyHelper;
+import me.rename.later.interfaces.EncryptionStrategy;
 import me.rename.later.strategies.RSAEncryptionStrategy;
 import org.junit.jupiter.api.Test;
-import me.rename.later.strategies.AESEncryptionStrategy;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 public class RSAEncryptionStrategyTest {
 
     @Test
     public void testSuccesfullyDecryptsMsg() throws Exception
     {
-        RSAEncryptionStrategy strat = new RSAEncryptionStrategy();
+
+        HashMap<String, String> keys = KeyHelper.generateRSAKeys();
+        String base64PublicKey = keys.get(KeyHelper.PUBLIC_KEY);
+        String base64PrivateKey = keys.get(KeyHelper.PRIVATE_KEY);
+        PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(base64PublicKey);
+        PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(base64PrivateKey);
+        RSAEncryptionStrategy strat = new RSAEncryptionStrategy(publicKey, privateKey);
         String originalString = "BLA BLA BLA BLA BLA BLA BLA BLA BLA";
         byte[] plainText = originalString.getBytes();
         byte[] cipherText = strat.encrypt(plainText);

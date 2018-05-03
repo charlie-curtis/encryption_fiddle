@@ -1,15 +1,20 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import me.rename.later.helpers.KeyHelper;
 import org.junit.jupiter.api.Test;
 import me.rename.later.strategies.AESEncryptionStrategy;
+import java.security.Key;
+import java.util.HashMap;
 
 public class AESEncryptionStrategyTest {
 
     @Test
     public void testSuccesfullyDecryptsMsg() throws Exception
     {
-        String key = "ABCDEFGHIJKLMNOPQRSTUVWX";
-        AESEncryptionStrategy strat = new AESEncryptionStrategy(key.getBytes());
+        HashMap<String, String> encodedKeys = KeyHelper.generateAESKey();
+        String encodedKey = encodedKeys.get(KeyHelper.PRIVATE_KEY);
+        Key key = KeyHelper.createAESKeyFromBase64EncodedString(encodedKey);
+        AESEncryptionStrategy strat = new AESEncryptionStrategy(key);
         String originalString = "BLA BLA BLA BLA BLA BLA BLA BLA BLA";
         byte[] plainText = originalString.getBytes();
         byte[] cipherText = strat.encrypt(plainText);
@@ -17,16 +22,4 @@ public class AESEncryptionStrategyTest {
         String decryptedString = new String(decryptedText);
         assertEquals(originalString, decryptedString);
     }
-
-    /*
-    @Test
-    public void testThrowsExceptionForWrongKeyLength()
-    {
-        Executable testCode = () -> {
-            String key = "NOT_THE_RIGHT_LENGTH";
-            new AESEncryptionStrategy(key.getBytes());
-        };
-        assertThrows(Exception.class, testCode);
-    }
-    */
 }

@@ -19,11 +19,15 @@ public class AESEncryptionStrategy implements EncryptionStrategy
      * Sets up the encryption algorithm to use AES encryption
      * @param key must be a valid AES encryption size. 128/192/256 bits
      */
-    public AESEncryptionStrategy(byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException
+    public AESEncryptionStrategy(Key key) throws NoSuchAlgorithmException, NoSuchPaddingException
     {
-        int[] validKeyLengths = {16, 24, 32};
         this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        this.key = new SecretKeySpec(key, "AES");
+        this.key = key;
+        this.initializeIvSpec();
+    }
+
+    private void initializeIvSpec()
+    {
         //TODO redesign the IV spec
         byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this.ivSpec = new IvParameterSpec(iv);
