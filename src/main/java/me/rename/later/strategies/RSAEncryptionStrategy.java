@@ -1,15 +1,17 @@
 package me.rename.later.strategies;
 
+import me.rename.later.interfaces.EncryptionStrategy;
+
 import javax.crypto.Cipher;
 import java.security.*;
 
-public class RSAEncryptionStrategy
+public class RSAEncryptionStrategy implements EncryptionStrategy
 {
     private PublicKey publicKey;
     private PrivateKey privateKey;
     private Cipher cipher;
 
-    public RSAEncryptionStrategy() throws GeneralSecurityException
+    public RSAEncryptionStrategy(PublicKey publicKey, PrivateKey privateKey) throws GeneralSecurityException
     {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
