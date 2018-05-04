@@ -1,9 +1,16 @@
 package me.rename.later.strategies;
 
 import me.rename.later.interfaces.EncryptionStrategy;
-import javax.crypto.*;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 public class AESEncryptionStrategy implements EncryptionStrategy
 {

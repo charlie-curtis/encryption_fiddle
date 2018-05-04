@@ -1,10 +1,10 @@
-import static org.junit.jupiter.api.Assertions.*;
-
 import me.rename.later.helpers.KeyHelper;
 import org.junit.jupiter.api.Test;
 import me.rename.later.strategies.AESEncryptionStrategy;
 import java.security.Key;
 import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AESEncryptionStrategyTest {
 

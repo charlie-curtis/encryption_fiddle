@@ -1,13 +1,12 @@
-import static org.junit.jupiter.api.Assertions.*;
-
 import me.rename.later.helpers.KeyHelper;
-import me.rename.later.interfaces.EncryptionStrategy;
 import me.rename.later.strategies.RSAEncryptionStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RSAEncryptionStrategyTest {
 

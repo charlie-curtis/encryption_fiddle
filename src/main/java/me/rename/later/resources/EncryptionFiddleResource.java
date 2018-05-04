@@ -17,7 +17,6 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.HashMap;
 
 //TODO make API in README.md
 @Path("/")
@@ -29,8 +28,8 @@ public class EncryptionFiddleResource {
     /**
      * Generates a key or set of keys based on the cipher.
      * The return keys are base64encoded.
-     * @param cipher
-     * @return
+     * @param cipher The Encryption Algorithm to be used.
+     * @return Response.
      */
     @Path("generate/keys/{cipher}")
     @GET
@@ -38,20 +37,7 @@ public class EncryptionFiddleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response generateKeys(@PathParam("cipher") String cipher) throws GeneralSecurityException {
 
-        //TODO move this somewhere else.
-        HashMap<String, String> generatedKeys;
-        switch (cipher) {
-            case "AES":
-                generatedKeys = KeyHelper.generateAESKey();
-                break;
-            case "RSA":
-                generatedKeys = KeyHelper.generateRSAKeys();
-                break;
-            default:
-                generatedKeys = new HashMap<>();
-                break;
-        }
-        return Response.ok(generatedKeys).build();
+        return Response.ok(KeyHelper.generateKeysForCipher(cipher)).build();
     }
     /**
      * Encrypts plaintext using the AES Cipher
@@ -59,7 +45,7 @@ public class EncryptionFiddleResource {
      * @param key String
      * @return
      */
-    @Path("encrypt/aes/text/{plainText}/key/{key}")
+    @Path("encrypt/AES/text/{plainText}/key/{key}")
     @GET
     @Timed
     public Response aesEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
@@ -73,7 +59,6 @@ public class EncryptionFiddleResource {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -84,7 +69,7 @@ public class EncryptionFiddleResource {
      * @param key String
      * @return
      */
-    @Path("decrypt/aes/text/{cipherText}/key/{key}")
+    @Path("decrypt/AES/text/{cipherText}/key/{key}")
     @GET
     @Timed
     public Response aesDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
@@ -98,7 +83,6 @@ public class EncryptionFiddleResource {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -109,7 +93,7 @@ public class EncryptionFiddleResource {
      * @param key String
      * @return
      */
-    @Path("decrypt/rsa/text/{cipherText}/key/{key}")
+    @Path("decrypt/RSA/text/{cipherText}/key/{key}")
     @GET
     @Timed
     public Response rsaDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
@@ -123,7 +107,6 @@ public class EncryptionFiddleResource {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -133,7 +116,7 @@ public class EncryptionFiddleResource {
      * @param key String
      * @return
      */
-    @Path("decrypt/rsa/text/{plainText}/key/{key}")
+    @Path("decrypt/RSA/text/{plainText}/key/{key}")
     @GET
     @Timed
     public Response rsaEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
@@ -147,7 +130,6 @@ public class EncryptionFiddleResource {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
