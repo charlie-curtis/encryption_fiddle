@@ -6,6 +6,7 @@ import me.rename.later.helpers.KeyHelper;
 import me.rename.later.interfaces.EncryptionStrategy;
 import me.rename.later.managers.EncryptionManager;
 import me.rename.later.strategies.AESEncryptionStrategy;
+import me.rename.later.strategies.RSAEncryptionStrategy;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -51,8 +52,7 @@ public class EncryptionFiddleResource {
     public Response aesEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
         try {
             Key secretKey = KeyHelper.createAESKeyFromBase64EncodedString(key);
-            EncryptionStrategy strat = new AESEncryptionStrategy(secretKey);
-            EncryptionManager manager = new EncryptionManager(strat);
+            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             byte[] cipherText = manager.encrypt(plainText.getBytes());
             return Response.ok(new String(cipherText)).build();
         } catch (GeneralSecurityException e) {
@@ -75,8 +75,7 @@ public class EncryptionFiddleResource {
     public Response aesDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
         try {
             Key secretKey = KeyHelper.createAESKeyFromBase64EncodedString(key);
-            EncryptionStrategy strat = new AESEncryptionStrategy(secretKey);
-            EncryptionManager manager = new EncryptionManager(strat);
+            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             byte[] plainText = manager.decrypt(cipherText.getBytes());
             return Response.ok(new String(plainText)).build();
         } catch (GeneralSecurityException e) {
@@ -98,9 +97,8 @@ public class EncryptionFiddleResource {
     @Timed
     public Response rsaDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
         try {
-            PrivateKey secretKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
-            EncryptionStrategy strat = new AESEncryptionStrategy(secretKey);
-            EncryptionManager manager = new EncryptionManager(strat);
+            PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
+            EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
             byte[] plainText = manager.decrypt(cipherText.getBytes());
             return Response.ok(new String(plainText)).build();
         } catch (GeneralSecurityException e) {
@@ -116,15 +114,14 @@ public class EncryptionFiddleResource {
      * @param key String
      * @return
      */
-    @Path("decrypt/RSA/text/{plainText}/key/{key}")
+    @Path("encrypt/RSA/text/{plainText}/key/{key}")
     @GET
     @Timed
     public Response rsaEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
         try {
             PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
-            EncryptionStrategy strat = new AESEncryptionStrategy(publicKey);
-            EncryptionManager manager = new EncryptionManager(strat);
-            byte[] cipherText = manager.decrypt(plainText.getBytes());
+            EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
+            byte[] cipherText = manager.encrypt(plainText.getBytes());
             return Response.ok(new String(cipherText)).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {

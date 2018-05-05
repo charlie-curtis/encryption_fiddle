@@ -17,8 +17,8 @@ import java.util.HashMap;
 
 public class KeyHelper
 {
-    private static final String CIPHER_AES = "AES";
-    private static final String CIPHER_RSA = "RSA";
+    public static final String CIPHER_AES = "AES";
+    public static final String CIPHER_RSA = "RSA";
     public static final String PRIVATE_KEY = "private_key";
     public static final String PUBLIC_KEY = "public_key";
 

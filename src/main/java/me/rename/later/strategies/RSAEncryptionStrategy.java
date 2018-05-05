@@ -1,5 +1,6 @@
 package me.rename.later.strategies;
 
+import me.rename.later.helpers.KeyHelper;
 import me.rename.later.interfaces.EncryptionStrategy;
 
 import javax.crypto.Cipher;
@@ -17,6 +18,17 @@ public class RSAEncryptionStrategy implements EncryptionStrategy
     {
         this.cipher = Cipher.getInstance("RSA");
         this.publicKey = publicKey;
+        this.privateKey = privateKey;
+    }
+
+    public RSAEncryptionStrategy(PublicKey publicKey) throws GeneralSecurityException
+    {
+        this.cipher = Cipher.getInstance(KeyHelper.CIPHER_RSA);
+        this.publicKey = publicKey;
+    }
+
+    public RSAEncryptionStrategy(PrivateKey privateKey) throws GeneralSecurityException {
+        this.cipher = Cipher.getInstance(KeyHelper.CIPHER_RSA);
         this.privateKey = privateKey;
     }
 
