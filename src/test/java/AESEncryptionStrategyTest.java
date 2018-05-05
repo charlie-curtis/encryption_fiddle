@@ -13,13 +13,11 @@ public class AESEncryptionStrategyTest {
     {
         HashMap<String, String> encodedKeys = KeyHelper.generateAESKey();
         String encodedKey = encodedKeys.get(KeyHelper.PRIVATE_KEY);
-        Key key = KeyHelper.createAESKeyFromBase64EncodedString(encodedKey);
+        Key key = KeyHelper.createAESKeyFromEncodedString(encodedKey);
         AESEncryptionStrategy strat = new AESEncryptionStrategy(key);
         String originalString = "BLA BLA BLA BLA BLA BLA BLA BLA BLA";
-        byte[] plainText = originalString.getBytes();
-        byte[] cipherText = strat.encrypt(plainText);
-        byte[] decryptedText = strat.decrypt(cipherText);
-        String decryptedString = new String(decryptedText);
-        assertEquals(originalString, decryptedString);
+        String base64CipherText = strat.encrypt(originalString);
+        String decryptedText = strat.decrypt(base64CipherText);
+        assertEquals(originalString, decryptedText);
     }
 }

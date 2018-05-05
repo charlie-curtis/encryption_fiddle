@@ -7,6 +7,7 @@ import javax.crypto.Cipher;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 
 public class RSAEncryptionStrategy implements EncryptionStrategy
 {
@@ -34,25 +35,28 @@ public class RSAEncryptionStrategy implements EncryptionStrategy
 
     /**
      * Encrypt using the public key
-     * @param plainText
-     * @return
+     * @param plainText UTF-8 encoded plaintext message
+     * @return base64 encoded ciphertext
      * @throws GeneralSecurityException
      */
-    public byte[] encrypt(byte[] plainText) throws GeneralSecurityException
+    public String encrypt(String plainText) throws GeneralSecurityException
     {
         this.cipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
-        return this.cipher.doFinal(plainText);
+        byte[] encryptedMessage = this.cipher.doFinal(plainText.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedMessage);
     }
 
     /**
      * Decrypt using the private key
-     * @param cipherText
-     * @return
+     * @param cipherText a base64 encoded cipherText
+     * @return The unencrypted message. UTF-8 encoded.
      * @throws GeneralSecurityException
      */
-    public byte[] decrypt(byte[] cipherText) throws GeneralSecurityException
+    public String decrypt(String cipherText) throws GeneralSecurityException
     {
+        byte[] decodedCipherText = Base64.getDecoder().decode(cipherText);
         this.cipher.init(Cipher.DECRYPT_MODE, this.privateKey);
-        return this.cipher.doFinal(cipherText);
+        byte[] decryptedMessage = this.cipher.doFinal(decodedCipherText);
+        return new String(decryptedMessage);
     }
 }

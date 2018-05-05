@@ -8,6 +8,9 @@ import me.rename.later.managers.EncryptionManager;
 import me.rename.later.strategies.AESEncryptionStrategy;
 import me.rename.later.strategies.RSAEncryptionStrategy;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,6 +21,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.HashMap;
 
 //TODO make API in README.md
 @Path("/")
@@ -51,10 +55,10 @@ public class EncryptionFiddleResource {
     @Timed
     public Response aesEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
         try {
-            Key secretKey = KeyHelper.createAESKeyFromBase64EncodedString(key);
+            Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
             EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-            byte[] cipherText = manager.encrypt(plainText.getBytes());
-            return Response.ok(new String(cipherText)).build();
+            String cipherText = manager.encrypt(plainText);
+            return Response.ok(cipherText).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -74,10 +78,10 @@ public class EncryptionFiddleResource {
     @Timed
     public Response aesDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
         try {
-            Key secretKey = KeyHelper.createAESKeyFromBase64EncodedString(key);
+            Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
             EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-            byte[] plainText = manager.decrypt(cipherText.getBytes());
-            return Response.ok(new String(plainText)).build();
+            String plainText = manager.decrypt(cipherText);
+            return Response.ok(plainText).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -99,8 +103,8 @@ public class EncryptionFiddleResource {
         try {
             PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
             EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
-            byte[] plainText = manager.decrypt(cipherText.getBytes());
-            return Response.ok(new String(plainText)).build();
+            String plainText = manager.decrypt(cipherText);
+            return Response.ok(plainText).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -121,8 +125,8 @@ public class EncryptionFiddleResource {
         try {
             PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
             EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
-            byte[] cipherText = manager.encrypt(plainText.getBytes());
-            return Response.ok(new String(cipherText)).build();
+            String cipherText = manager.encrypt(plainText);
+            return Response.ok(cipherText).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();

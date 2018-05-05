@@ -4,6 +4,6 @@ import java.security.GeneralSecurityException;
 
 public interface EncryptionStrategy
 {
-    byte[] encrypt(byte[] plainText) throws GeneralSecurityException;
-    byte[] decrypt(byte[] cipherText) throws GeneralSecurityException;
+    String encrypt(String plainText) throws GeneralSecurityException;
+    String decrypt(String cipherText) throws GeneralSecurityException;
 }

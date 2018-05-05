@@ -1,5 +1,7 @@
 package me.rename.later.helpers;
 
+import me.rename.later.exceptions.EncryptionFiddleException;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -21,6 +23,7 @@ public class KeyHelper
     public static final String CIPHER_RSA = "RSA";
     public static final String PRIVATE_KEY = "private_key";
     public static final String PUBLIC_KEY = "public_key";
+    public static final String IV_SPEC = "iv_spec";
 
     /**
      * @return Base64 encoded private key.
@@ -49,7 +52,7 @@ public class KeyHelper
         return map;
     }
 
-    public static Key createAESKeyFromBase64EncodedString(String encodedKey)
+    public static Key createAESKeyFromEncodedString(String encodedKey)
     {
         byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
         return new SecretKeySpec(decodedKey, CIPHER_AES);

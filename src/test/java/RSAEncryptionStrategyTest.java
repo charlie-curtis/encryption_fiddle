@@ -13,7 +13,6 @@ public class RSAEncryptionStrategyTest {
     @Test
     public void testSuccesfullyDecryptsMsg() throws Exception
     {
-
         HashMap<String, String> keys = KeyHelper.generateRSAKeys();
         String base64PublicKey = keys.get(KeyHelper.PUBLIC_KEY);
         String base64PrivateKey = keys.get(KeyHelper.PRIVATE_KEY);
@@ -21,10 +20,8 @@ public class RSAEncryptionStrategyTest {
         PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(base64PrivateKey);
         RSAEncryptionStrategy strat = new RSAEncryptionStrategy(publicKey, privateKey);
         String originalString = "BLA BLA BLA BLA BLA BLA BLA BLA BLA";
-        byte[] plainText = originalString.getBytes();
-        byte[] cipherText = strat.encrypt(plainText);
-        byte[] decryptedText = strat.decrypt(cipherText);
-        String decryptedString = new String(decryptedText);
-        assertEquals(originalString, decryptedString);
+        String cipherText = strat.encrypt(originalString);
+        String decryptedText = strat.decrypt(cipherText);
+        assertEquals(originalString, decryptedText);
     }
 }

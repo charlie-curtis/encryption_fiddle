@@ -1,7 +1,6 @@
 package me.rename.later.managers;
 
 import java.security.GeneralSecurityException;
-import java.util.Base64;
 import me.rename.later.interfaces.EncryptionStrategy;
 
 public class EncryptionManager {
@@ -13,17 +12,13 @@ public class EncryptionManager {
         this.encryptionStrategy = encryptionStrategy;
     }
 
-    public byte[] decrypt(byte[] cipherText) throws GeneralSecurityException
+    public String decrypt(String cipherText) throws GeneralSecurityException
     {
-        return Base64.getEncoder().encode(
-            encryptionStrategy.decrypt(
-                Base64.getDecoder().decode(cipherText)));
+        return this.encryptionStrategy.decrypt(cipherText);
     }
 
-    public byte[] encrypt(byte[] plainText) throws GeneralSecurityException
+    public String encrypt(String plainText) throws GeneralSecurityException
     {
-        return Base64.getEncoder().encode(
-            this.encryptionStrategy.encrypt(
-                Base64.getDecoder().decode(plainText)));
+        return this.encryptionStrategy.encrypt(plainText);
     }
 }

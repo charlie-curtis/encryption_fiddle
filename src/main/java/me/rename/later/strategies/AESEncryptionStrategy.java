@@ -1,5 +1,6 @@
 package me.rename.later.strategies;
 
+import me.rename.later.exceptions.EncryptionFiddleException;
 import me.rename.later.interfaces.EncryptionStrategy;
 
 import javax.crypto.BadPaddingException;
@@ -11,13 +12,14 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Base64;
 
 public class AESEncryptionStrategy implements EncryptionStrategy
 {
 
     private Cipher cipher;
     private Key key;
-    private IvParameterSpec ivSpec;
 
     /**
      * Sets up the encryption algorithm to use AES encryption
@@ -27,27 +29,43 @@ public class AESEncryptionStrategy implements EncryptionStrategy
     {
         this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.key = key;
-        this.initializeIvSpec();
     }
 
-    private void initializeIvSpec()
+    public String encrypt(String plainText) throws InvalidKeyException,
+        InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
+        InvalidParameterSpecException
     {
-        //TODO redesign the IV spec
-        byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        this.ivSpec = new IvParameterSpec(iv);
+        this.cipher.init(Cipher.ENCRYPT_MODE, this.key);
+        IvParameterSpec ivParameterSpec = cipher.getParameters().getParameterSpec(IvParameterSpec.class);
+        String ivSpec = Base64.getEncoder().encodeToString(ivParameterSpec.getIV());
+        String message = Base64.getEncoder().encodeToString(this.cipher.doFinal(plainText.getBytes()));
+        //Put the IV Spec as part of the message so that the decryption can detect it
+        return ivSpec + ":" + message;
     }
 
-    public byte[] encrypt(byte[] plainText) throws InvalidKeyException,
+    /**
+     *
+     * @param cipherText A base 64 encoded string. The IV spec is appended
+     *                   to the front of the original message text.
+     * @return A UTF-8 plaintext string
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidParameterSpecException
+     */
+    public String decrypt(String cipherText) throws InvalidKeyException,
         InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
     {
-        this.cipher.init(Cipher.ENCRYPT_MODE, this.key, ivSpec);
-        return this.cipher.doFinal(plainText);
-    }
-
-    public byte[] decrypt(byte[] cipherText) throws InvalidKeyException,
-        InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
-    {
-        this.cipher.init(Cipher.DECRYPT_MODE, this.key, this.ivSpec);
-        return this.cipher.doFinal(cipherText);
+        String[] cipherTextParts = cipherText.split(":");
+        if (cipherTextParts.length != 2) {
+            throw new EncryptionFiddleException("Invalid key format. IV Spec couldn't be determined");
+        }
+        byte[] ivSpec = Base64.getDecoder().decode(cipherTextParts[0]);
+        IvParameterSpec ivSpecParam = new IvParameterSpec(ivSpec);
+        byte[] encryptedMessage = Base64.getDecoder().decode(cipherTextParts[1]);
+        this.cipher.init(Cipher.DECRYPT_MODE, this.key, ivSpecParam);
+        byte[] decryptedMessage = this.cipher.doFinal(encryptedMessage);
+        return new String(decryptedMessage);
     }
 }
