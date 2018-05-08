@@ -53,16 +53,20 @@ public class EncryptionFiddleResource {
     @Path("encrypt/AES/text/{plainText}/key/{key}")
     @GET
     @Timed
+    @Produces(MediaType.APPLICATION_JSON)
     public Response aesEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
         try {
             Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
             EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             String cipherText = manager.encrypt(plainText);
-            return Response.ok(cipherText).build();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("msg", cipherText);
+            return Response.ok(map).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -76,16 +80,20 @@ public class EncryptionFiddleResource {
     @Path("decrypt/AES/text/{cipherText}/key/{key}")
     @GET
     @Timed
+    @Produces(MediaType.APPLICATION_JSON)
     public Response aesDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
         try {
             Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
             EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             String plainText = manager.decrypt(cipherText);
-            return Response.ok(plainText).build();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("msg", plainText);
+            return Response.ok(map).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -99,16 +107,20 @@ public class EncryptionFiddleResource {
     @Path("decrypt/RSA/text/{cipherText}/key/{key}")
     @GET
     @Timed
+    @Produces(MediaType.APPLICATION_JSON)
     public Response rsaDecrypt(@PathParam("cipherText") String cipherText, @PathParam("key") String key) {
         try {
             PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
             EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
             String plainText = manager.decrypt(cipherText);
-            return Response.ok(plainText).build();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("msg", plainText);
+            return Response.ok(map).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -121,16 +133,20 @@ public class EncryptionFiddleResource {
     @Path("encrypt/RSA/text/{plainText}/key/{key}")
     @GET
     @Timed
+    @Produces(MediaType.APPLICATION_JSON)
     public Response rsaEncrypt(@PathParam("plainText") String plainText, @PathParam("key") String key) {
         try {
             PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
             EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
             String cipherText = manager.encrypt(plainText);
-            return Response.ok(cipherText).build();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("msg", cipherText);
+            return Response.ok(map).build();
         } catch (GeneralSecurityException e) {
             if (EncryptionExceptionHandler.isClientError(e)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             }
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
