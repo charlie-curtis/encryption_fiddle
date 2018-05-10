@@ -20,7 +20,6 @@ public class KeyHelper
     public static final String CIPHER_RSA = "RSA";
     public static final String PRIVATE_KEY = "private_key";
     public static final String PUBLIC_KEY = "public_key";
-    public static final String IV_SPEC = "iv_spec";
 
     /**
      * @return Base64 encoded private key.
