@@ -2,6 +2,7 @@ package me.rename.later.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import me.rename.later.helpers.KeyHelper;
+import me.rename.later.interfaces.EncryptionStrategy;
 import me.rename.later.managers.EncryptionManager;
 import me.rename.later.strategies.AESEncryptionStrategy;
 import me.rename.later.strategies.RSAEncryptionStrategy;
@@ -14,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -55,17 +55,15 @@ public class EncryptionFiddleResource {
     public Response encrypt(@FormParam("text") String plainText, @FormParam("key") String key,
                                 @FormParam("cipher") String cipher) {
 
+        EncryptionStrategy strat;
         if (cipher.equals(KeyHelper.CIPHER_AES)) {
             Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
-            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-            String cipherText = manager.encrypt(plainText);
-            HashMap<String, String> map = new HashMap<>();
-            map.put("msg", cipherText);
-            return Response.ok(map).build();
+            strat = new AESEncryptionStrategy(secretKey);
+        } else {
+            PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
+            strat = new RSAEncryptionStrategy(publicKey);
         }
-        PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
-        EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
-        String cipherText = manager.encrypt(plainText);
+        String cipherText = new EncryptionManager(strat).encrypt(plainText);
         HashMap<String, String> map = new HashMap<>();
         map.put("msg", cipherText);
         return Response.ok(map).build();
@@ -83,17 +81,15 @@ public class EncryptionFiddleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response decrypt(@FormParam("text") String cipherText, @FormParam("key") String key,
                             @FormParam("cipher") String cipher) {
+        EncryptionStrategy strat;
         if (cipher.equals(KeyHelper.CIPHER_AES)) {
             Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
-            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-            String plainText = manager.decrypt(cipherText);
-            HashMap<String, String> map = new HashMap<>();
-            map.put("msg", plainText);
-            return Response.ok(map).build();
+            strat = new AESEncryptionStrategy(secretKey);
+        } else {
+            PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
+            strat = new RSAEncryptionStrategy(privateKey);
         }
-        PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
-        EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
-        String plainText = manager.decrypt(cipherText);
+        String plainText = new EncryptionManager(strat).decrypt(cipherText);
         HashMap<String, String> map = new HashMap<>();
         map.put("msg", plainText);
         return Response.ok(map).build();
