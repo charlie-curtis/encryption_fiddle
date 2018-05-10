@@ -1,7 +1,6 @@
 package me.rename.later.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import me.rename.later.exceptions.EncryptionExceptionHandler;
 import me.rename.later.helpers.KeyHelper;
 import me.rename.later.managers.EncryptionManager;
 import me.rename.later.strategies.AESEncryptionStrategy;
@@ -38,12 +37,11 @@ public class EncryptionFiddleResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public Response generateKeys(@PathParam("cipher") String cipher) throws GeneralSecurityException {
-
+    public Response generateKeys(@PathParam("cipher") String cipher)
+    {
         return Response.ok(KeyHelper.generateKeysForCipher(cipher)).build();
     }
     //TODO consolidate the encryption endpoints into one.
-    //Convert exceptions to runtime exceptions and bubble them up
     /**
      * Encrypts plaintext using the input cipher
      * @param plainText String - as of right now, this string must be base 64 encoded
@@ -58,35 +56,19 @@ public class EncryptionFiddleResource {
                                 @FormParam("cipher") String cipher) {
 
         if (cipher.equals(KeyHelper.CIPHER_AES)) {
-            try {
-                Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
-                EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-                String cipherText = manager.encrypt(plainText);
-                HashMap<String, String> map = new HashMap<>();
-                map.put("msg", cipherText);
-                return Response.ok(map).build();
-            } catch (GeneralSecurityException e) {
-                if (EncryptionExceptionHandler.isClientError(e)) {
-                    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-                }
-                e.printStackTrace();
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
-        try {
-            PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
-            EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
+            Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
+            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             String cipherText = manager.encrypt(plainText);
             HashMap<String, String> map = new HashMap<>();
             map.put("msg", cipherText);
             return Response.ok(map).build();
-        } catch (GeneralSecurityException e) {
-            if (EncryptionExceptionHandler.isClientError(e)) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-            }
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+        PublicKey publicKey = KeyHelper.createRSAPublicKeyFromBase64EncodedString(key);
+        EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(publicKey));
+        String cipherText = manager.encrypt(plainText);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("msg", cipherText);
+        return Response.ok(map).build();
     }
 
     /**
@@ -102,34 +84,18 @@ public class EncryptionFiddleResource {
     public Response decrypt(@FormParam("text") String cipherText, @FormParam("key") String key,
                             @FormParam("cipher") String cipher) {
         if (cipher.equals(KeyHelper.CIPHER_AES)) {
-            try {
-                Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
-                EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
-                String plainText = manager.decrypt(cipherText);
-                HashMap<String, String> map = new HashMap<>();
-                map.put("msg", plainText);
-                return Response.ok(map).build();
-            } catch (GeneralSecurityException e) {
-                if (EncryptionExceptionHandler.isClientError(e)) {
-                    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-                }
-                e.printStackTrace();
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
-        try {
-            PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
-            EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
+            Key secretKey = KeyHelper.createAESKeyFromEncodedString(key);
+            EncryptionManager manager = new EncryptionManager(new AESEncryptionStrategy(secretKey));
             String plainText = manager.decrypt(cipherText);
             HashMap<String, String> map = new HashMap<>();
             map.put("msg", plainText);
             return Response.ok(map).build();
-        } catch (GeneralSecurityException e) {
-            if (EncryptionExceptionHandler.isClientError(e)) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-            }
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+        PrivateKey privateKey = KeyHelper.createRSAPrivateKeyFromBase64EncodedString(key);
+        EncryptionManager manager = new EncryptionManager(new RSAEncryptionStrategy(privateKey));
+        String plainText = manager.decrypt(cipherText);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("msg", plainText);
+        return Response.ok(map).build();
     }
 }

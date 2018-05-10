@@ -1,11 +1,8 @@
 package me.rename.later.helpers;
 
-import me.rename.later.exceptions.EncryptionFiddleException;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -28,28 +25,36 @@ public class KeyHelper
     /**
      * @return Base64 encoded private key.
      */
-    public static HashMap<String, String> generateAESKey() throws GeneralSecurityException
+    public static HashMap<String, String> generateAESKey()
     {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(CIPHER_AES);
-        keyGenerator.init(256);
-        Key key = keyGenerator.generateKey();
-        HashMap<String, String> map = new HashMap<>();
-        map.put(PRIVATE_KEY, new String(Base64.getEncoder().encode(key.getEncoded())));
-        return map;
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(CIPHER_AES);
+            keyGenerator.init(256);
+            Key key = keyGenerator.generateKey();
+            HashMap<String, String> map = new HashMap<>();
+            map.put(PRIVATE_KEY, new String(Base64.getEncoder().encode(key.getEncoded())));
+            return map;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * @return Base64 encoded public/private key, respectively.
      */
-    public static HashMap<String, String> generateRSAKeys() throws GeneralSecurityException
+    public static HashMap<String, String> generateRSAKeys()
     {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(CIPHER_RSA);
-        keyPairGenerator.initialize(2048);
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        HashMap<String, String> map = new HashMap<>();
-        map.put(PUBLIC_KEY, new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded())));
-        map.put(PRIVATE_KEY, new String(Base64.getEncoder().encode(keyPair.getPrivate().getEncoded())));
-        return map;
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(CIPHER_RSA);
+            keyPairGenerator.initialize(2048);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            HashMap<String, String> map = new HashMap<>();
+            map.put(PUBLIC_KEY, new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded())));
+            map.put(PRIVATE_KEY, new String(Base64.getEncoder().encode(keyPair.getPrivate().getEncoded())));
+            return map;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Key createAESKeyFromEncodedString(String encodedKey)
@@ -58,21 +63,29 @@ public class KeyHelper
         return new SecretKeySpec(decodedKey, CIPHER_AES);
     }
 
-    public static PublicKey createRSAPublicKeyFromBase64EncodedString(String encodedKey) throws GeneralSecurityException
+    public static PublicKey createRSAPublicKeyFromBase64EncodedString(String encodedKey)
     {
-        byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
-        return KeyFactory.getInstance(CIPHER_RSA).generatePublic(keySpec);
+        try {
+            byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
+            return KeyFactory.getInstance(CIPHER_RSA).generatePublic(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static PrivateKey createRSAPrivateKeyFromBase64EncodedString(String encodedKey) throws GeneralSecurityException
+    public static PrivateKey createRSAPrivateKeyFromBase64EncodedString(String encodedKey)
     {
-        byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
-        return KeyFactory.getInstance(CIPHER_RSA).generatePrivate(keySpec);
+        try {
+            byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
+            return KeyFactory.getInstance(CIPHER_RSA).generatePrivate(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static HashMap<String, String> generateKeysForCipher(String cipher) throws GeneralSecurityException
+    public static HashMap<String, String> generateKeysForCipher(String cipher)
     {
         HashMap<String, String> generatedKeys;
         switch (cipher) {

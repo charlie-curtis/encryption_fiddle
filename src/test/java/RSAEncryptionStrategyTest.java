@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RSAEncryptionStrategyTest {
 
     @Test
-    public void testSuccesfullyDecryptsMsg() throws Exception
+    public void testSuccesfullyDecryptsMsg()
     {
         HashMap<String, String> keys = KeyHelper.generateRSAKeys();
         String base64PublicKey = keys.get(KeyHelper.PUBLIC_KEY);

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AESEncryptionStrategyTest {
 
     @Test
-    public void testSuccesfullyDecryptsMsg() throws Exception
+    public void testSuccesfullyDecryptsMsg()
     {
         HashMap<String, String> encodedKeys = KeyHelper.generateAESKey();
         String encodedKey = encodedKeys.get(KeyHelper.PRIVATE_KEY);
